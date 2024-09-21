@@ -3,9 +3,11 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@layerzero-labs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
 
-contract SaturnToken is ERC20, Ownable, NonblockingLzApp {
+import {ByteHasher} from "./helpers/ByteHasher.sol";
+import {IWorldID} from "./interfaces/IWorldID.sol";
+
+contract SaturnToken is ERC20, Ownable {
     using ByteHasher for bytes;
 
     /// @notice Thrown when attempting to reuse a nullifier
@@ -33,15 +35,13 @@ contract SaturnToken is ERC20, Ownable, NonblockingLzApp {
     
     uint256 internal immutable actionId;
 
-    uint16 public constant OPTIMISM_CHAIN_ID = 10; // LayerZero chain ID for Optimism
-
-    constructor(address _lzEndpoint, 
+    constructor(
         uint256 _frequency, 
         uint256 _amount,
         IWorldID _worldId,
         string memory _appId,
         string memory _actionId 
-    ) ERC20("Saturn Token", "SRN") Ownable(msg.sender) NonblockingLzApp(_lzEndpoint) {
+    ) ERC20("Saturn Token", "SRN") Ownable(msg.sender) {
         distributionFrequency = _frequency;
         distributionAmount = _amount;
         lastDistributionTime = block.timestamp;
@@ -58,11 +58,25 @@ contract SaturnToken is ERC20, Ownable, NonblockingLzApp {
         uint256 root,
         uint256 nullifierHash,
         uint256[8] calldata proof
-    ) external payable {
+    ) external {
+        
+        // simple verify
         require(!isParticipant(msg.sender), "Already a participant");
 
-        bytes memory payload = abi.encode(msg.sender, signal, root, nullifierHash, proof);
-        _lzSend(OPTIMISM_CHAIN_ID, payload, payable(msg.sender), address(0x0), bytes(""), msg.value);
+        // Verify WorldID proof
+        worldId.verifyProof(
+            root,
+            groupId,
+            abi.encodePacked(signal).hashToField(),
+            nullifierHash,
+            externalNullifier,
+            proof
+        );
+
+        nullifierHashes[nullifierHash] = true;
+
+        
+        participant_list.push(msg.sender);
     }
 
     function isParticipant(address _address) public view returns (bool) {
@@ -117,16 +131,6 @@ contract SaturnToken is ERC20, Ownable, NonblockingLzApp {
 
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
-    }
-
-    function _nonblockingLzReceive(uint16 _srcChainId, bytes memory _srcAddress, uint64 _nonce, bytes memory _payload) internal override {
-        require(_srcChainId == OPTIMISM_CHAIN_ID, "Invalid source chain");
-        
-        (bool success, address participant) = abi.decode(_payload, (bool, address));
-        
-        if (success) {
-            participant_list.push(participant);
-        }
     }
 
 }
