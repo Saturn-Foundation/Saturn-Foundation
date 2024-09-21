@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { motion, useScroll } from "framer-motion";
 
 const timelineEvents = [
   { year: 2023, title: "Foundation", description: "Launched our blockchain-based charity platform" },
@@ -24,8 +24,10 @@ const Timeline = () => {
 
   return (
     <div className="py-24 bg-base-200">
+     
       <h2 className="text-4xl font-bold text-center mb-12">Our Journey</h2>
       <div className="container mx-auto px-4">
+  
         {timelineEvents.map((event, index) => (
           <motion.div
             key={event.year}
