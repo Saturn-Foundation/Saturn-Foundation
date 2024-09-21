@@ -3,13 +3,23 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount, useChainId, useSendTransaction } from 'wagmi';
+import { parseEther } from 'viem';
 
-const PaymentBox = () => {
+export const PaymentBox = () => {
   const [amount, setAmount] = useState('');
+  const { address, isConnected } = useAccount();
+  // const { chain } = useNetwork();
+  const { sendTransaction } = useSendTransaction();
 
   const handleDonate = () => {
-    // TODO: Implement blockchain donation logic
-    console.log(`Donating ${amount} to the charity`);
+    if (!isConnected || !amount) return;
+    const toAddress = '0x55f529544965Ab97afb4325dF5D8A9b08f9C58E5';
+    sendTransaction({
+      to: toAddress,
+      value: parseEther(amount),
+    });
+    console.log(`Donating ${amount} to ${toAddress}`);
     // Reset amount after donation
     setAmount('');
   };
@@ -21,7 +31,6 @@ const PaymentBox = () => {
       transition={{ duration: 0.8 }}
       className="bg-base-200 p-6 rounded-lg shadow-lg max-w-md mx-auto"
     >
-   
       <h2 className="text-2xl font-bold mb-4 text-center">Support Our Cause</h2>
       <p className="mb-4 text-center">Your donation helps us make a difference through blockchain technology.</p>
       <div className="mb-4">
@@ -39,13 +48,12 @@ const PaymentBox = () => {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="btn btn-primary w-full"
+        className="btn btn-primary w-full mt-4"
         onClick={handleDonate}
-        disabled={!amount}
+        disabled={!isConnected || !amount}
       >
         Donate Now
       </motion.button>
-
       <p className="mt-4 text-sm text-center">
         All donations are securely processed and transparently recorded on the blockchain.
       </p>
@@ -54,3 +62,7 @@ const PaymentBox = () => {
 };
 
 export default PaymentBox;
+// function useNetwork(): { chain: any; } {
+//   throw new Error('Function not implemented.');
+// }
+
