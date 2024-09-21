@@ -7,15 +7,29 @@ import { PaymentBox } from './payment';
 import VerifyBox from './verify';
 import { IDKitWidget, ISuccessResult, VerificationLevel } from '@worldcoin/idkit'
 import Link from 'next/link';
+import ParticipateBox from './participate';
+import { useAccount } from 'wagmi';
+
 
 const Hero = () => {
   const [isLaunched, setIsLaunched] = useState(false);
   const [isLogo, setIsLogo] = useState(false);
   const [isVefiry, setIsVerify] = useState(false);
   const [isPayment, setIsPayment] = useState(false);
+  const [isParticipate, setIsParticipate] = useState(false);
+
+  const [proof, setProof] = useState<any>(null);
+
+  const { address } = useAccount();
+
   // TODO: Calls your implemented server route
   const handleVerify = async (proof: ISuccessResult) => {
     console.log("this is hanlde verify ", proof);
+    setProof(proof);
+    const nullifier_hash = proof.nullifier_hash;
+    const proof_hash = proof.proof;
+
+
     // const res = await fetch("/api/verify", { // route to your backend will depend on implementation
     //     method: "POST",
     //     headers: {
@@ -30,6 +44,7 @@ const Hero = () => {
 
   // TODO: Functionality after verifying
   const onSuccess = () => {
+    setIsParticipate(true);
     console.log("Success")
   };
   const handleLaunch = () => {
@@ -109,63 +124,76 @@ const Hero = () => {
                 </div>
                 {isVefiry && (
                   <div className="flex justify-start mr-60 items-center w-full">
+                    
                     <IDKitWidget
                       app_id="app_3dd0a307d4d88ccd91448e9319bc0916"
                       action="verify-human"
-                      verification_level={VerificationLevel.Device}
+                      verification_level={VerificationLevel.Orb}
+                      signal={address}
                       handleVerify={handleVerify}
                       onSuccess={onSuccess}>
                       {({ open }) => (
                         <button
                           onClick={open}
-                          className="btn btn-primary"
+                          className="btn btn-primary mr-10"
                         >
-                          Verify with World ID
+                          🚀 Sign up to UBI
                         </button>
                       )}
                     </IDKitWidget>
-                    <button
-                      className="btn btn-secondary"
-                      onClick={() => {
-                        setIsPayment(true);
-                        // Assuming you want to set other states, add them here
-                        // For example:
-                        // setIsDonating(true);
-                        // setDonationAmount(0);
-                      }}
-                    >
-                      Donate Now !
-                    </button>
+
                   </div>
                 )}
               </div>
             )}
 
           </div>
-          <Link href="/contribute">
-            <button
+          <div className="flex justify-start mr-60 items-center w-full">
 
-              className="btn btn-primary mt-4  w-2/4 "
+            <button
+              className="btn btn-primary w-2/3 mt-4"
+              onClick={() => {
+                setIsPayment(true);
+                // Assuming you want to set other states, add them here
+                // For example:
+                // setIsDonating(true);
+                // setDonationAmount(0);
+              }}
             >
               Contribute
             </button>
-          </Link>
+          </div>
+          <div className="flex justify-start mr-60 items-center w-full">
+
+
+          </div>
         </div>
         <div className="h-[600px] w-full mr-40">
           <ThreeComponent />
         </div>
       </div>
 
-      {isPayment && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <PaymentBox />
-            <div className="modal-action">
-              <button className="btn" onClick={() => setIsPayment(false)}>Close</button>
-            </div> 
+        {isPayment && (
+          <div className="modal modal-open">
+            <div className="modal-box">
+              <PaymentBox />
+              <div className="modal-action">
+                <button className="btn" onClick={() => setIsPayment(false)}>Close</button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {isParticipate && (
+          <div className="modal modal-open">
+            <div className="modal-box">
+              <ParticipateBox proof={proof} />
+              <div className="modal-action">
+                <button className="btn" onClick={() => setIsParticipate(false)}>Close</button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };

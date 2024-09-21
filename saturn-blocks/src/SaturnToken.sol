@@ -3,26 +3,10 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@layerzero-labs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
+
+import "../lib/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
 
 contract SaturnToken is ERC20, Ownable, NonblockingLzApp {
-    using ByteHasher for bytes;
-
-    /// @notice Thrown when attempting to reuse a nullifier
-    error InvalidNullifier();
-
-    /// @dev The World ID instance that will be used for verifying proofs
-    IWorldID internal immutable worldId;
-
-    /// @dev The contract's external nullifier hash
-    uint256 internal immutable externalNullifier;
-
-    /// @dev The World ID group ID (always 1)
-    uint256 internal immutable groupId = 1;
-
-    /// @dev Whether a nullifier hash has been used already. Used to guarantee an action is only performed once by a single person
-    mapping(uint256 => bool) internal nullifierHashes;
-
 
     uint256 public distributionFrequency;
     uint256 public distributionAmount;
@@ -30,27 +14,29 @@ contract SaturnToken is ERC20, Ownable, NonblockingLzApp {
     uint256 public lastDistributionTime;
     uint256 public constant TOKENS_PER_ETH = 1000;
 
-    
-    uint256 internal immutable actionId;
-
     uint16 public constant OPTIMISM_CHAIN_ID = 10; // LayerZero chain ID for Optimism
 
-    constructor(address _lzEndpoint, 
-        uint256 _frequency, 
-        uint256 _amount,
-        IWorldID _worldId,
-        string memory _appId,
-        string memory _actionId 
-    ) ERC20("Saturn Token", "SRN") Ownable(msg.sender) NonblockingLzApp(_lzEndpoint) {
-        distributionFrequency = _frequency;
-        distributionAmount = _amount;
-        lastDistributionTime = block.timestamp;
-        worldId = _worldId;
+    address public optimismVerifierAddress;
 
-        externalNullifier = abi
-            .encodePacked(abi.encodePacked(_appId).hashToField(), _actionId)
-            .hashToField();
-        
+    constructor(address _lzEndpoint, address _optimismVerifierAddress) ERC20("Saturn Token", "SRN") Ownable(msg.sender) NonblockingLzApp(_lzEndpoint) {
+        // Set default values or use setter functions later
+        distributionFrequency = 1 days; // Default to daily distribution
+        distributionAmount = 100 * 10**decimals(); // Default to 100 tokens
+        lastDistributionTime = block.timestamp;
+        optimismVerifierAddress = _optimismVerifierAddress;
+    }
+
+    // Add setter functions for distributionFrequency and distributionAmount
+    function setDistributionFrequency(uint256 _frequency) external onlyOwner {
+        distributionFrequency = _frequency;
+    }
+
+    function setDistributionAmount(uint256 _amount) external onlyOwner {
+        distributionAmount = _amount;
+    }
+
+    function setOptimismVerifierAddress(address _newAddress) external onlyOwner {
+        optimismVerifierAddress = _newAddress;
     }
 
     function participate(
@@ -62,7 +48,7 @@ contract SaturnToken is ERC20, Ownable, NonblockingLzApp {
         require(!isParticipant(msg.sender), "Already a participant");
 
         bytes memory payload = abi.encode(msg.sender, signal, root, nullifierHash, proof);
-        _lzSend(OPTIMISM_CHAIN_ID, payload, payable(msg.sender), address(0x0), bytes(""), msg.value);
+        _lzSend(OPTIMISM_CHAIN_ID, payload, payable(optimismVerifierAddress), address(0x0), bytes(""), msg.value);
     }
 
     function isParticipant(address _address) public view returns (bool) {

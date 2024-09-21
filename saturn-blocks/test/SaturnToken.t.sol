@@ -7,14 +7,14 @@ import {IWorldID} from "../lib/world-id-contracts/src/interfaces/IWorldID.sol";
 
 contract MockWorldID is IWorldID {
     function verifyProof(
-        uint256,
-        uint256,
-        uint256,
-        uint256,
-        uint256,
-        uint256[8] calldata
-    ) external pure {
-        // This mock always succeeds
+        uint256 root,
+        uint256 groupId,
+        uint256 signalHash,
+        uint256 nullifierHash,
+        uint256 externalNullifierHash,
+        uint256[8] calldata proof
+    ) external view override {
+        // Implement mock behavior
     }
 }
 
@@ -30,18 +30,10 @@ contract SaturnTokenTest is Test {
     uint256 constant TOKENS_PER_ETH = 1000;
 
     function setUp() public {
-        mockWorldID = new MockWorldID();
+        saturnToken = new SaturnToken(address(0)); // Use a mock address for LzEndpoint
         owner = address(this);
         user1 = address(0x1);
         user2 = address(0x2);
-
-        saturnToken = new SaturnToken(
-            DISTRIBUTION_FREQUENCY,
-            DISTRIBUTION_AMOUNT,
-            mockWorldID,
-            "app_id",
-            "action_id"
-        );
 
         // Mint some initial tokens to the contract
         saturnToken.mint(address(saturnToken), 1000000 ether);
@@ -54,8 +46,8 @@ contract SaturnTokenTest is Test {
     }
 
     function testParticipate() public {
-        vm.prank(user1);
-        saturnToken.participate(user1, 0, 0, new uint256[](8));
+        uint256[8] memory proof;
+        saturnToken.participate(user1, 0, 0, proof);
         assertTrue(saturnToken.isParticipant(user1));
     }
 

@@ -12,3 +12,4 @@ solidity-examples/=lib/solidity-examples/contracts/
 solmate/=lib/world-id-contracts/lib/solmate/src/
 world-id-contracts/=lib/world-id-contracts/
 zk-kit/=lib/world-id-contracts/lib/zk-kit/
+solidity-examples/=lib/solidity-examples/

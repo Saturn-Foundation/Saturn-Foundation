@@ -20,3 +20,6 @@ Token address on Ethereum Sepolia
 Token address on Optimism Sepolia
 `0x55f529544965Ab97afb4325dF5D8A9b08f9C58E5`
 
+Flow contract with LayerZero to Optimism Sepolia (hopefully)
+`0x56A1D262A3aC373219451476d84999369a6E6357`
+

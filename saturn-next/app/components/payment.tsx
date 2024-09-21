@@ -31,10 +31,10 @@ export const PaymentBox = () => {
       transition={{ duration: 0.8 }}
       className="bg-base-200 p-6 rounded-lg shadow-lg max-w-md mx-auto"
     >
-      <h2 className="text-2xl font-bold mb-4 text-center">Support Our Cause</h2>
-      <p className="mb-4 text-center">Your donation helps us make a difference through blockchain technology.</p>
+      <h2 className="text-2xl font-bold mb-4 text-center">Contribute to Saturn Fund</h2>
+      <p className="mb-4 text-center">You are funding global UBI at scale.</p>
       <div className="mb-4">
-        <label htmlFor="amount" className="block mb-2">Donation Amount:</label>
+        <label htmlFor="amount" className="block mb-2">Amount:</label>
         <input
           type="number"
           id="amount"
@@ -52,10 +52,10 @@ export const PaymentBox = () => {
         onClick={handleDonate}
         disabled={!isConnected || !amount}
       >
-        Donate Now
+        Deposit
       </motion.button>
       <p className="mt-4 text-sm text-center">
-        All donations are securely processed and transparently recorded on the blockchain.
+        All transactions are securely processed and transparently recorded on the blockchain.
       </p>
     </motion.div>
   );

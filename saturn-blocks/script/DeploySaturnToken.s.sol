@@ -7,13 +7,12 @@ import "../src/SaturnToken.sol";
 contract DeploySaturnToken is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address lzEndpoint = vm.envAddress("LZ_ENDPOINT");
+        address lzEndpoint = vm.envAddress("LZ_ENDPOINT_FLOW");
+        address optimismVerifierAddress = vm.envAddress("OPTIMISM_VERIFIER_ADDRESS");
 
         vm.startBroadcast(deployerPrivateKey);
 
-        SaturnToken token = new SaturnToken(
-            lzEndpoint
-        );
+        SaturnToken token = new SaturnToken(lzEndpoint, optimismVerifierAddress);
 
         console.log("SaturnToken deployed at:", address(token));
 
