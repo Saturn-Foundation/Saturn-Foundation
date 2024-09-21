@@ -15,7 +15,7 @@ const Credential = () => {
   }
 
   return (
-    <div className="bg-base-100 py-16">
+    <div className="py-16">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -24,7 +24,7 @@ const Credential = () => {
           className="text-center mb-12"
         >
           <h2 className="text-4xl font-bold mb-4">Open Source DAO Governance</h2>
-          <p className="text-xl">Empowering our community through transparent and decentralized decision-making</p>
+          <p className="text-xl">Uniting hearts with blockchain for a cause.</p>
         </motion.div>
         
         <div className="grid md:grid-cols-2 gap-8">
