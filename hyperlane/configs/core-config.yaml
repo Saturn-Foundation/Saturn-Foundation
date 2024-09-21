@@ -1,0 +1,16 @@
+defaultHook:
+  type: merkleTreeHook
+defaultIsm:
+  relayer: "0x8aB0e8b986cB26aC6363f43Fd79E8f92821bDc92"
+  type: trustedRelayerIsm
+owner: "0x8aB0e8b986cB26aC6363f43Fd79E8f92821bDc92"
+requiredHook:
+  beneficiary: "0x8aB0e8b986cB26aC6363f43Fd79E8f92821bDc92"
+  maxProtocolFee: "100000000000000000"
+  owner: "0x8aB0e8b986cB26aC6363f43Fd79E8f92821bDc92"
+  protocolFee: "100000000"
+  type: protocolFee
+chains:
+  flowevm:
+    chainId: 545
+    gasPrice: "100000000"  # 100 Gwei, the minimum mentioned in the error
