@@ -8,7 +8,7 @@ const timelineEvents = [
   { year: 2024, title: "Global Expansion", description: "Partnered with international NGOs" },
   { year: 2025, title: "AI Integration", description: "Implemented AI for optimized fund allocation" },
   { year: 2026, title: "Decentralized Governance", description: "Introduced community-driven decision making" },
-  { year: 2027, title: "Universal Impact", description: "Reached 100 million beneficiaries worldwide" },
+  { year: 2027, title: "Universal Impact", description: "Reached millions beneficiaries worldwide" },
 ];
 
 const Timeline = () => {
