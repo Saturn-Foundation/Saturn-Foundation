@@ -4,27 +4,9 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import {ByteHasher} from "./helpers/ByteHasher.sol";
-import {IWorldID} from "./interfaces/IWorldID.sol";
+import "../lib/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
 
-contract SaturnTokenBack is ERC20, Ownable {
-    using ByteHasher for bytes;
-
-    /// @notice Thrown when attempting to reuse a nullifier
-    error InvalidNullifier();
-
-    /// @dev The World ID instance that will be used for verifying proofs
-    IWorldID internal immutable worldId;
-
-    /// @dev The contract's external nullifier hash
-    uint256 internal immutable externalNullifier;
-
-    /// @dev The World ID group ID (always 1)
-    uint256 internal immutable groupId = 1;
-
-    /// @dev Whether a nullifier hash has been used already. Used to guarantee an action is only performed once by a single person
-    mapping(uint256 => bool) internal nullifierHashes;
-
+contract SaturnTokenLZ is ERC20, Ownable, NonblockingLzApp {
 
     uint256 public distributionFrequency;
     uint256 public distributionAmount;
@@ -32,27 +14,29 @@ contract SaturnTokenBack is ERC20, Ownable {
     uint256 public lastDistributionTime;
     uint256 public constant TOKENS_PER_ETH = 1000;
 
-    
-    uint256 internal immutable actionId;
+    uint16 public constant OPTIMISM_CHAIN_ID = 10; // LayerZero chain ID for Optimism
 
-    constructor(
-        uint256 _frequency, 
-        uint256 _amount,
-        IWorldID _worldId,
-        string memory _appId,
-        string memory _actionId 
-    ) ERC20("Saturn Token", "SRN") Ownable(msg.sender) {
-        distributionFrequency = _frequency;
-        distributionAmount = _amount;
+    address public optimismVerifierAddress;
+
+    constructor(address _lzEndpoint, address _optimismVerifierAddress) ERC20("Saturn Token", "SRN") Ownable(msg.sender) NonblockingLzApp(_lzEndpoint) {
+        // Set default values or use setter functions later
+        distributionFrequency = 1 days; // Default to daily distribution
+        distributionAmount = 100 * 10**decimals(); // Default to 100 tokens
         lastDistributionTime = block.timestamp;
-        worldId = _worldId;
+        optimismVerifierAddress = _optimismVerifierAddress;
+    }
 
-        externalNullifier = abi
-            .encodePacked(abi.encodePacked(_appId).hashToField(), _actionId)
-            .hashToField();
-        
-        // Missing: Initialize actionId
-        actionId = abi.encodePacked(_actionId).hashToField();
+    // Add setter functions for distributionFrequency and distributionAmount
+    function setDistributionFrequency(uint256 _frequency) external onlyOwner {
+        distributionFrequency = _frequency;
+    }
+
+    function setDistributionAmount(uint256 _amount) external onlyOwner {
+        distributionAmount = _amount;
+    }
+
+    function setOptimismVerifierAddress(address _newAddress) external onlyOwner {
+        optimismVerifierAddress = _newAddress;
     }
 
     function participate(
@@ -60,25 +44,11 @@ contract SaturnTokenBack is ERC20, Ownable {
         uint256 root,
         uint256 nullifierHash,
         uint256[8] calldata proof
-    ) external {
-        
-        // simple verify
+    ) external payable {
         require(!isParticipant(msg.sender), "Already a participant");
 
-        // Verify WorldID proof
-        worldId.verifyProof(
-            root,
-            groupId,
-            abi.encodePacked(signal).hashToField(),
-            nullifierHash,
-            externalNullifier,
-            proof
-        );
-
-        nullifierHashes[nullifierHash] = true;
-
-        
-        participant_list.push(msg.sender);
+        bytes memory payload = abi.encode(msg.sender, signal, root, nullifierHash, proof);
+        _lzSend(OPTIMISM_CHAIN_ID, payload, payable(optimismVerifierAddress), address(0x0), bytes(""), msg.value);
     }
 
     function isParticipant(address _address) public view returns (bool) {
@@ -133,6 +103,16 @@ contract SaturnTokenBack is ERC20, Ownable {
 
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
+    }
+
+    function _nonblockingLzReceive(uint16 _srcChainId, bytes memory _srcAddress, uint64 _nonce, bytes memory _payload) internal override {
+        require(_srcChainId == OPTIMISM_CHAIN_ID, "Invalid source chain");
+        
+        (bool success, address participant) = abi.decode(_payload, (bool, address));
+        
+        if (success) {
+            participant_list.push(participant);
+        }
     }
 
 }
