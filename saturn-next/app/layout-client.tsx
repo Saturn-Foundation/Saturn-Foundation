@@ -2,7 +2,6 @@
 
 
 import { NearContext } from '../context';
-
 import { SetStateAction, useEffect, useState } from "react";
 import { DynamicContextProvider, DynamicWidget } from '@dynamic-labs/sdk-react-core';
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -11,7 +10,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider } from 'wagmi'
 // import { IDKitProvider } from '@worldcoin/idkit'
 // import { config } from '../config'
-
 
 const config = getDefaultConfig({
     appName: 'crypto-ql',
@@ -46,10 +44,7 @@ const MPC_CONTRACT = 'v1.signer-prod.testnet';
 // @ts-ignore
 // const wallet = new Wallet({ networkId: 'testnet', createAccessKeyFor: MPC_CONTRACT });
 
-
-
 const queryClient = new QueryClient()
-
 
 const LayoutClient = ({ children }: { children: React.ReactNode }) => {
     const [signedAccountId, setSignedAccountId] = useState<string>('');

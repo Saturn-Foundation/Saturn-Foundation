@@ -55,7 +55,7 @@ const Credential = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="mt-12 text-center"
         >
-          <a href="https://github.com/your-organization" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+          <a href="https://github.com/Saturn-Foundation" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
             View Our GitHub
           </a>
         </motion.div>
