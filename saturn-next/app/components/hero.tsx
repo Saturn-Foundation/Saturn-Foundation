@@ -110,8 +110,7 @@ const Hero = () => {
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
             />
             {isLogo && (
-              <div className="flex justify-end items-center w-full">
-            <div className="flex items-center space-x-4">
+              <div className="flex justify-center items-center w-full mr-40">
                   <motion.svg
                     width="100"
                     height="100"
@@ -141,8 +140,7 @@ const Hero = () => {
                       transition={{ duration: 2, ease: "easeInOut", delay: 1 }}
                     />
                   </motion.svg>
-                </div>
-                {isVefiry && (
+                {/* {isVefiry && (
                   <div className="flex justify-start mr-60 items-center w-full">
                     
                     <IDKitWidget
@@ -163,7 +161,7 @@ const Hero = () => {
                     </IDKitWidget>
 
                   </div>
-                )}
+                )} */}
               </div>
             )}
 
@@ -183,6 +181,28 @@ const Hero = () => {
               Contribute
             </button>
           </div>
+          {isVefiry && (
+            <div className="flex justify-start mr-60 items-center w-full">
+              <IDKitWidget
+                app_id="app_3dd0a307d4d88ccd91448e9319bc0916"
+                action="verify-human"
+                verification_level={VerificationLevel.Orb}
+                signal={address}
+                handleVerify={handleVerify}
+                onSuccess={onSuccess}>
+                {({ open }) => (
+                  <button
+                    onClick={open}
+                    className="btn btn-primary mr-10 w-2/3 mt-4"
+
+                  >
+                    🚀 Sign up to UBI
+                  </button>
+                )}
+              </IDKitWidget>
+
+            </div>
+          )}
           <div className="flex justify-start mr-60 items-center w-full">
 
 
@@ -193,27 +213,27 @@ const Hero = () => {
         </div>
       </div>
 
-        {isPayment && (
-          <div className="modal modal-open">
-            <div className="modal-box">
-              <PaymentBox />
-              <div className="modal-action">
-                <button className="btn" onClick={() => setIsPayment(false)}>Close</button>
-              </div>
+      {isPayment && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <PaymentBox />
+            <div className="modal-action">
+              <button className="btn" onClick={() => setIsPayment(false)}>Close</button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {isParticipate && (
-          <div className="modal modal-open">
-            <div className="modal-box">
-              <ParticipateBox proof={proof} />
-              <div className="modal-action">
-                <button className="btn" onClick={() => setIsParticipate(false)}>Close</button>
-              </div>
+      {isParticipate && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <ParticipateBox proof={proof} />
+            <div className="modal-action">
+              <button className="btn" onClick={() => setIsParticipate(false)}>Close</button>
             </div>
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 };
