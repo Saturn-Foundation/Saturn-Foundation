@@ -72,16 +72,16 @@ const ThreeComponent = (botState: { chatBotState?: string; }) => {
             {/* <pointLight intensity={0.8} position={[-5, 5, -3]} /> */}
 
             {/* Optional rim light for highlighting edges */}
-            <spotLight intensity={10} position={[-5, 10, 5]} angle={0.3} penumbra={1} />
+            <spotLight intensity={2} position={[-5, 10, 5]} angle={0.3} penumbra={1} />
 
             {/* without enviroment */}
             {/* <Environment preset="dawn" background blur={0.5} /> */}
 
-            <directionalLight intensity={10} position={[2, 5, 3]} />
+            <directionalLight intensity={2} position={[2, 5, 3]} />
             {/* wait when model are being built */}
 
             {/* Additional ambient light for overall brightness */}
-            <ambientLight intensity={10} />
+            <ambientLight intensity={2} />
 
             {/* Soft fill light from the opposite side */}
             {/* <pointLight intensity={1.5} position={[-5, 5, -3]} /> */}
@@ -91,7 +91,7 @@ const ThreeComponent = (botState: { chatBotState?: string; }) => {
 
 
             {/* <Model2 userState={chatBotState} /> */}
-            <Planet userState={chatBotState} />
+            <Planet />
             {/* </ Suspense> */}
 
         </Canvas>
