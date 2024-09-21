@@ -1,14 +1,28 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
 
 const About = () => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
+
   return (
-    <div className="hero min-h-screen bg-base-100">
+    <motion.div 
+      ref={ref}
+      style={{ opacity, scale }}
+      className="hero min-h-screen bg-base-100"
+    >
       <div className="hero-content flex-col lg:flex-row">
         <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ x: -50 }}
+          whileInView={{ x: 0 }}
           transition={{ duration: 0.8 }}
           className="lg:w-1/2"
         >
@@ -25,8 +39,8 @@ const About = () => {
           </motion.button>
         </motion.div>
         <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ x: 50 }}
+          whileInView={{ x: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className="lg:w-1/2"
         >
@@ -43,7 +57,7 @@ const About = () => {
           </div>
         </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
