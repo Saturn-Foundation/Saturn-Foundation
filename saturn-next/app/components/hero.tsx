@@ -56,7 +56,7 @@ const Hero = () => {
     }, 1000);
     setTimeout(() => {
       setIsVerify(true);
-    }, 2000);
+    }, 4000);
     // Example: setTimeout(() => { /* perform action */ }, 1000);
   };
 
@@ -111,16 +111,36 @@ const Hero = () => {
             />
             {isLogo && (
               <div className="flex justify-end items-center w-full">
-                <div className="flex items-center space-x-4">
-                  <motion.img
-                    src="https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/saturn-svgrepo-com.svg?t=2024-09-21T14%3A09%3A39.606Z"
-                    alt="New Logo"
+            <div className="flex items-center space-x-4">
+                  <motion.svg
                     width="100"
                     height="100"
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 20 }}
-                  />
+                    viewBox="0 0 100 100"
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <motion.path
+                      d="M50 10 A40 40 0 1 1 50 90 A40 40 0 1 1 50 10 Z"
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 2, ease: "easeInOut" }}
+                    />
+                    <motion.ellipse
+                      cx="50"
+                      cy="50"
+                      rx="50"
+                      ry="10"
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 2, ease: "easeInOut", delay: 1 }}
+                    />
+                  </motion.svg>
                 </div>
                 {isVefiry && (
                   <div className="flex justify-start mr-60 items-center w-full">
