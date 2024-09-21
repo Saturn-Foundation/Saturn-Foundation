@@ -1,0 +1,14 @@
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+@zk-kit/=lib/world-id-contracts/lib/zk-kit/packages/
+contracts-upgradeable/=lib/world-id-contracts/lib/openzeppelin-contracts-upgradeable/contracts/
+ds-test/=lib/world-id-contracts/lib/ds-test/src/
+erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/
+forge-std/=lib/forge-std/src/
+openzeppelin-contracts-upgradeable/=lib/world-id-contracts/lib/openzeppelin-contracts-upgradeable/
+openzeppelin-contracts/=lib/openzeppelin-contracts/
+openzeppelin/=lib/world-id-contracts/lib/openzeppelin-contracts/contracts/
+semaphore/=lib/world-id-contracts/lib/
+solidity-examples/=lib/solidity-examples/contracts/
+solmate/=lib/world-id-contracts/lib/solmate/src/
+world-id-contracts/=lib/world-id-contracts/
+zk-kit/=lib/world-id-contracts/lib/zk-kit/
