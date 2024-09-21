@@ -9,6 +9,7 @@ import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider } from 'wagmi'
+// import { IDKitProvider } from '@worldcoin/idkit'
 // import { config } from '../config'
 
 
@@ -75,7 +76,7 @@ const LayoutClient = ({ children }: { children: React.ReactNode }) => {
         <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
             <RainbowKitProvider>
-                <NearContext.Provider value={{ wallet, signedAccountId }}>
+                {/* <NearContext.Provider value={{ wallet, signedAccountId }}> */}
                     {/* <main className="min-h-screen h-screen w-screen flex flex-row ">
                         <div className="flex-grow overflow-auto mx-12 my-12">
                             <div className=""> */}
@@ -83,7 +84,7 @@ const LayoutClient = ({ children }: { children: React.ReactNode }) => {
                             {/* </div>
                         </div>
                     </main> */}
-                </NearContext.Provider>
+                {/* </NearContext.Provider> */}
                 </RainbowKitProvider>
             </QueryClientProvider>  
         </WagmiProvider>
