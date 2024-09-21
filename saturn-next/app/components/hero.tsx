@@ -62,7 +62,7 @@ const Hero = () => {
     }, 1000);
     setTimeout(() => {
       setIsVerify(true);
-    }, 2000);
+    }, 4000);
     // Example: setTimeout(() => { /* perform action */ }, 1000);
   };
 
@@ -259,19 +259,37 @@ const Hero = () => {
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
             />
             {isLogo && (
-              <div className="flex justify-end items-center w-full">
-                <div className="flex items-center space-x-4">
-                  <motion.img
-                    src="https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/saturn-svgrepo-com.svg?t=2024-09-21T14%3A09%3A39.606Z"
-                    alt="New Logo"
+              <div className="flex justify-center items-center w-full mr-40">
+                  <motion.svg
                     width="100"
                     height="100"
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 20 }}
-                  />
-                </div>
-                {isVefiry && (
+                    viewBox="0 0 100 100"
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <motion.path
+                      d="M50 10 A40 40 0 1 1 50 90 A40 40 0 1 1 50 10 Z"
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 2, ease: "easeInOut" }}
+                    />
+                    <motion.ellipse
+                      cx="50"
+                      cy="50"
+                      rx="50"
+                      ry="10"
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 2, ease: "easeInOut", delay: 1 }}
+                    />
+                  </motion.svg>
+                {/* {isVefiry && (
                   <div className="flex justify-start mr-60 items-center w-full">
 
                     {/* <IDKitWidget
@@ -316,7 +334,7 @@ const Hero = () => {
                     )}
 
                   </div>
-                )}
+                )} */}
               </div>
             )}
 
@@ -324,7 +342,7 @@ const Hero = () => {
           <div className="flex justify-start mr-60 items-center w-full">
 
             <button
-              className="btn btn-primary w-2/3 mt-4"
+              className="btn btn-secondary w-2/3 mt-4"
               onClick={() => {
                 setIsPayment(true);
                 // Assuming you want to set other states, add them here
@@ -336,6 +354,28 @@ const Hero = () => {
               Contribute
             </button>
           </div>
+          {isVefiry && (
+            <div className="flex justify-start mr-60 items-center w-full">
+              <IDKitWidget
+                app_id="app_3dd0a307d4d88ccd91448e9319bc0916"
+                action="verify-human"
+                verification_level={VerificationLevel.Orb}
+                signal={address}
+                handleVerify={handleVerify}
+                onSuccess={onSuccess}>
+                {({ open }) => (
+                  <button
+                    onClick={open}
+                    className="btn btn-primary mr-10 w-2/3 mt-4"
+
+                  >
+                    🚀 Sign up to UBI
+                  </button>
+                )}
+              </IDKitWidget>
+
+            </div>
+          )}
           <div className="flex justify-start mr-60 items-center w-full">
 
 
