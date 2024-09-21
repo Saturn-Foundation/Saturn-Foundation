@@ -16,7 +16,7 @@ import { WagmiProvider } from 'wagmi'
 const config = getDefaultConfig({
     appName: 'crypto-ql',
     projectId: 'YOUR_PROJECT_ID',
-    chains: [mainnet, polygon, optimism, arbitrum, base, sepolia],
+    chains: [mainnet, polygon, optimism, arbitrum, base, sepolia, optimismSepolia],
     ssr: true, // If your dApp uses server side rendering (SSR)
   });
 
@@ -33,7 +33,8 @@ import {
   optimism,
   arbitrum,
   base,
-  sepolia
+  sepolia,
+  optimismSepolia
 } from 'wagmi/chains';
 
 

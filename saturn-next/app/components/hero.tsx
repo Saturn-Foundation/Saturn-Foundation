@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ThreeComponent from './ThreeComponent';
-import PaymentBox from './payment';
+import { PaymentBox } from './payment';
 import VerifyBox from './verify';
 import { IDKitWidget, ISuccessResult, VerificationLevel } from '@worldcoin/idkit'
 
@@ -14,7 +14,7 @@ const Hero = () => {
   const [isPayment, setIsPayment] = useState(false);
   // TODO: Calls your implemented server route
   const handleVerify = async (proof: ISuccessResult) => {
-    console.log("this is hanlde verify ",proof);
+    console.log("this is hanlde verify ", proof);
     // const res = await fetch("/api/verify", { // route to your backend will depend on implementation
     //     method: "POST",
     //     headers: {
@@ -25,7 +25,7 @@ const Hero = () => {
     // if (!res.ok) {
     //     throw new Error("Verification failed."); // IDKit will display the error message to the user in the modal
     // }
-};
+  };
 
   // TODO: Functionality after verifying
   const onSuccess = () => {
@@ -90,29 +90,8 @@ const Hero = () => {
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
             />
             {isLogo && (
-              <div className="flex justify-between items-center w-full">
-                {isVefiry && (
-                  <div className="flex-start">
-                    <IDKitWidget
-                      app_id="app_3dd0a307d4d88ccd91448e9319bc0916"
-                      action="verify-human"
-                      // On-chain only accepts Orb verifications
-                      verification_level={VerificationLevel.Device}
-                      handleVerify={handleVerify}
-                      // signal="0x8aB0e8b986cB26aC6363f43Fd79E8f92821bDc92" 
-                      onSuccess={onSuccess}>
-                      {({ open }) => (
-                        <button
-                          onClick={open}
-                          className="btn btn-primary"
-                        >
-                          Verify with World ID
-                        </button>
-                      )}
-                    </IDKitWidget>
-                  </div>
-                )}
-                <div className="flex-end">
+              <div className="flex justify-end items-center w-full">
+                <div className="flex items-center space-x-4">
                   <motion.img
                     src="https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/saturn-svgrepo-com.svg?t=2024-09-21T14%3A09%3A39.606Z"
                     alt="New Logo"
@@ -123,8 +102,40 @@ const Hero = () => {
                     transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 20 }}
                   />
                 </div>
+                {isVefiry && (
+                  <div className="flex justify-start mr-60 items-center w-full">
+                    <IDKitWidget
+                      app_id="app_3dd0a307d4d88ccd91448e9319bc0916"
+                      action="verify-human"
+                      verification_level={VerificationLevel.Device}
+                      handleVerify={handleVerify}
+                      onSuccess={onSuccess}>
+                      {({ open }) => (
+                        <button
+                          onClick={open}
+                          className="btn btn-primary"
+                        >
+                          Verify with World ID
+                        </button>
+                      )}
+                    </IDKitWidget>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => {
+                        setIsPayment(true);
+                        // Assuming you want to set other states, add them here
+                        // For example:
+                        // setIsDonating(true);
+                        // setDonationAmount(0);
+                      }}
+                    >
+                      Donate Now !
+                    </button>
+                  </div>
+                )}
               </div>
             )}
+
           </div>
         </div>
         <div className="h-[600px] w-full mr-40">
@@ -133,16 +144,12 @@ const Hero = () => {
       </div>
 
       {isPayment && (
-        <div className={`modal modal-open`}>
+        <div className="modal modal-open">
           <div className="modal-box">
             <PaymentBox />
-            {/* <VerifyBox setIsPayment={setIsPayment} setIsVerified={setIsVerify}/> */}
-
-            {/* <h3 className="font-bold text-lg">Payment Modal</h3>
-            <p className="py-4">This is the payment modal content.</p>
             <div className="modal-action">
               <button className="btn" onClick={() => setIsPayment(false)}>Close</button>
-            </div> */}
+            </div> 
           </div>
         </div>
       )}
