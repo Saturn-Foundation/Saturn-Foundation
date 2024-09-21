@@ -6,6 +6,7 @@ import ThreeComponent from './ThreeComponent';
 import PaymentBox from './payment';
 import VerifyBox from './verify';
 import { IDKitWidget, ISuccessResult, VerificationLevel } from '@worldcoin/idkit'
+import Link from 'next/link';
 
 const Hero = () => {
   const [isLaunched, setIsLaunched] = useState(false);
@@ -14,7 +15,7 @@ const Hero = () => {
   const [isPayment, setIsPayment] = useState(false);
   // TODO: Calls your implemented server route
   const handleVerify = async (proof: ISuccessResult) => {
-    console.log("this is hanlde verify ",proof);
+    console.log("this is hanlde verify ", proof);
     // const res = await fetch("/api/verify", { // route to your backend will depend on implementation
     //     method: "POST",
     //     headers: {
@@ -25,7 +26,7 @@ const Hero = () => {
     // if (!res.ok) {
     //     throw new Error("Verification failed."); // IDKit will display the error message to the user in the modal
     // }
-};
+  };
 
   // TODO: Functionality after verifying
   const onSuccess = () => {
@@ -46,12 +47,13 @@ const Hero = () => {
 
   return (
     <div className="hero bg-base-200 min-h-screen">
+
       <div className="hero-content flex-col lg:flex-row-reverse h-full w-full">
         <div className="text-center lg:text-left">
-          <h1 className="text-5xl font-bold">Saturn Foundation</h1>
-          <p className="py-6">
-            Empowers communities to govern charity through a DAO, ensuring every action is accountable and impactful.
-          </p>
+
+          <h1 className="text-5xl font-bold whitespace-nowrap">Saturn Foundation</h1>
+          <p className="py-6 text-4xl">
+            Enabling UBI on the global scale.</p>
           <div className="flex items-center space-x-16 mt-4 relative">
             <motion.div
               initial={{ x: 0 }}
@@ -62,6 +64,7 @@ const Hero = () => {
               onClick={handleLaunch}
               className="cursor-pointer p-2 rounded-lg inline-block"
             >
+
               <motion.img
                 src="https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/rocket-svgrepo-com.svg?t=2024-09-21T13%3A56%3A31.897Z"
                 alt="Saturn"
@@ -72,6 +75,8 @@ const Hero = () => {
                 animate={isLogo ? { x: '100%', opacity: 0, rotate: 45 } : { x: 0, opacity: 1, rotate: 45 }}
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
+
+
               {/* <img
                 src="https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/crypto-ql/rocket-svgrepo-com.svg?t=2024-09-21T13%3A56%3A31.897Z"
                 alt="Rocket"
@@ -126,6 +131,14 @@ const Hero = () => {
               </div>
             )}
           </div>
+          <Link href="/contribute">
+            <button
+
+              className="btn btn-primary mt-4  w-2/4 "
+            >
+              Contribute
+            </button>
+          </Link>
         </div>
         <div className="h-[600px] w-full mr-40">
           <ThreeComponent />
