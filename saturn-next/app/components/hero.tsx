@@ -151,7 +151,7 @@ const Hero = () => {
           <div className="flex justify-start mr-60 items-center w-full">
 
             <button
-              className="btn btn-primary w-2/3 mt-4"
+              className="btn btn-secondary w-2/3 mt-4"
               onClick={() => {
                 setIsPayment(true);
                 // Assuming you want to set other states, add them here
