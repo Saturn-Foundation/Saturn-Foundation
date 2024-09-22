@@ -209,6 +209,10 @@ const Hero = () => {
     }
   };
 
+  function onSuccess(result: ISuccessResult): void | Promise<void> {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <div className="hero bg-base-200 min-h-screen">
 
@@ -307,7 +311,7 @@ const Hero = () => {
                           🚀 Sign up to UBI
                         </button>
                       )}
-                    </IDKitWidget> */}
+                    </IDKitWidget>
                     {completed ? (
                       <div>
                         <p>You're in!</p>
@@ -367,7 +371,6 @@ const Hero = () => {
                   <button
                     onClick={open}
                     className="btn btn-primary mr-10 w-2/3 mt-4"
-
                   >
                     🚀 Sign up to UBI
                   </button>
