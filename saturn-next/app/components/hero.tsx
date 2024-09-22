@@ -10,6 +10,12 @@ import Link from 'next/link';
 import ParticipateBox from './participate';
 import { useAccount } from 'wagmi';
 
+import { parseEther, hexToBigInt } from 'viem';
+
+import { decodeAbiParameters, parseAbiParameters } from 'viem'
+
+import { useWriteContract } from 'wagmi'
+
 
 const Hero = () => {
   const [isLaunched, setIsLaunched] = useState(false);
@@ -17,7 +23,7 @@ const Hero = () => {
   const [isVefiry, setIsVerify] = useState(false);
   const [isPayment, setIsPayment] = useState(false);
   const [isParticipate, setIsParticipate] = useState(false);
-
+  const [completed, setCompleted] = useState(false);
   const [proof, setProof] = useState<any>(null);
 
   const { address } = useAccount();
@@ -43,10 +49,10 @@ const Hero = () => {
   };
 
   // TODO: Functionality after verifying
-  const onSuccess = () => {
-    setIsParticipate(true);
-    console.log("Success")
-  };
+  // const onSuccess = () => {
+  //   setIsParticipate(true);
+  //   console.log("Success")
+  // };
   const handleLaunch = () => {
     setIsLaunched(true);
     // Add your series of actions here
@@ -58,6 +64,149 @@ const Hero = () => {
       setIsVerify(true);
     }, 4000);
     // Example: setTimeout(() => { /* perform action */ }, 1000);
+  };
+
+  const {
+    writeContractAsync
+  } = useWriteContract()
+
+  const handleParticipate = async (proof: any) => {
+
+
+    // const abi = [
+    //   {
+    //     name: "participate",
+    //     type: "function",
+    //     inputs: [
+    //       { name: "signal", type: "address" },
+    //       { name: "root", type: "uint256" },
+    //       { name: "nullifierHash", type: "uint256" },
+    //       { name: "proof", type: "uint256[8]" }
+    //     ],
+    //     outputs: [],
+    //     stateMutability: "nonpayable"
+    //   }
+    // ];
+
+    const abi = [
+
+      {
+        "type": "constructor",
+        "inputs": [
+          {
+            "name": "_worldId",
+            "type": "address",
+            "internalType": "contract IWorldID"
+          },
+          {
+            "name": "_appId",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "_actionId",
+            "type": "string",
+            "internalType": "string"
+          }
+        ],
+        "stateMutability": "nonpayable"
+      },
+      {
+        "type": "function",
+        "name": "participate",
+        "inputs": [
+          {
+            "name": "signal",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "root",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "nullifierHash",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "proof",
+            "type": "uint256[8]",
+            "internalType": "uint256[8]"
+          }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+      },
+      {
+        "type": "event",
+        "name": "verified",
+        "inputs": [
+          {
+            "name": "nullifierHash",
+            "type": "uint256",
+            "indexed": false,
+            "internalType": "uint256"
+          }
+        ],
+        "anonymous": false
+      },
+      {
+        "type": "error",
+        "name": "DuplicateNullifier",
+        "inputs": [
+          {
+            "name": "nullifierHash",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+
+    ];
+
+    try {
+      console.log("Calling contract...");
+
+      // Remove '0x' prefix if present and split the proof string into 8 parts
+      // const cleanProof = proof.proof.proof.startsWith('0x') ? proof.proof.proof.slice(2) : proof.proof.proof;
+      // const proofParts = cleanProof.match(/.{1,64}/g);
+
+      // const result = await writeContractAsync({
+      //   address: '0xDAd3e1609D4b4E39f5551C8CBC8B003Ac06D4147',
+      //   abi,
+      //   functionName: 'participate',
+      //   args: [
+      //     address, // signal
+      //     safeBigInt(proof.proof.merkle_root), // root
+      //     safeBigInt(proof.proof.nullifier_hash), // nullifierHash
+      //     proofParts.map((part: any) => safeBigInt(`0x${part}`)) // proof
+      //   ],
+      // });
+
+      console.log(proof)
+      setCompleted(true)
+      const result = await writeContractAsync({
+        address: '0xeA537f5496CbF9507419D99e260ccf1822645560',
+        account: address,
+        abi,
+        functionName: 'participate',
+        args: [
+          address,
+          BigInt(proof!.merkle_root),
+          BigInt(proof!.nullifier_hash),
+          decodeAbiParameters(
+            parseAbiParameters('uint256[8]'),
+            proof!.proof as `0x${string}`
+          )[0],
+        ],
+      })
+
+      console.log("Transaction hash:", result);
+    } catch (error) {
+      console.error("Error calling contract:", error);
+    }
   };
 
   return (
@@ -142,8 +291,8 @@ const Hero = () => {
                   </motion.svg>
                 {/* {isVefiry && (
                   <div className="flex justify-start mr-60 items-center w-full">
-                    
-                    <IDKitWidget
+
+                    {/* <IDKitWidget
                       app_id="app_3dd0a307d4d88ccd91448e9319bc0916"
                       action="verify-human"
                       verification_level={VerificationLevel.Orb}
@@ -158,7 +307,31 @@ const Hero = () => {
                           🚀 Sign up to UBI
                         </button>
                       )}
-                    </IDKitWidget>
+                    </IDKitWidget> */}
+                    {completed ? (
+                      <div>
+                        <p>You're in!</p>
+                      </div>
+                    ) : (
+                      <IDKitWidget
+                        app_id="app_3dd0a307d4d88ccd91448e9319bc0916"
+                        action="verify-human"
+                        signal={address}
+                        handleVerify={handleVerify}
+                        onSuccess={handleParticipate}
+
+
+                      >
+                        {({ open }) => (
+                          <button
+                            onClick={open}
+                            className="btn btn-primary mr-10"
+                          >
+                            🚀 Sign up to UBI
+                          </button>
+                        )}
+                      </IDKitWidget>
+                    )}
 
                   </div>
                 )} */}

@@ -4,51 +4,124 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "../lib/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
+import {ByteHasher} from "./helpers/ByteHasher.sol";
+import {IWorldID} from "./interfaces/IWorldID.sol";
 
-contract SaturnToken is ERC20, Ownable, NonblockingLzApp {
+contract SaturnToken is ERC20, Ownable {
+    using ByteHasher for bytes;
+
+    /// @notice Thrown when attempting to reuse a nullifier
+	error DuplicateNullifier(uint256 nullifierHash);
+
+    /// @notice Thrown when attempting to reuse a nullifier
+    error InvalidNullifier();
+
+    /// @dev The World ID instance that will be used for verifying proofs
+    IWorldID internal immutable worldId;
+
+    /// @dev The contract's external nullifier hash
+    uint256 internal immutable externalNullifier;
+
+    /// @dev The World ID group ID (always 1)
+    uint256 internal immutable groupId = 1;
+
+    /// @dev Whether a nullifier hash has been used already. Used to guarantee an action is only performed once by a single person
+    mapping(uint256 => bool) internal nullifierHashes;
+
+    
+    /// @param nullifierHash The nullifier hash for the verified proof
+	/// @dev A placeholder event that is emitted when a user successfully verifies with World ID
+	event Verified(uint256 nullifierHash);
+
 
     uint256 public distributionFrequency;
     uint256 public distributionAmount;
     address[] public participant_list;
     uint256 public lastDistributionTime;
     uint256 public constant TOKENS_PER_ETH = 1000;
+    uint256 internal immutable actionId;
 
-    uint16 public constant OPTIMISM_CHAIN_ID = 10; // LayerZero chain ID for Optimism
-
-    address public optimismVerifierAddress;
-
-    constructor(address _lzEndpoint, address _optimismVerifierAddress) ERC20("Saturn Token", "SRN") Ownable(msg.sender) NonblockingLzApp(_lzEndpoint) {
-        // Set default values or use setter functions later
-        distributionFrequency = 1 days; // Default to daily distribution
-        distributionAmount = 100 * 10**decimals(); // Default to 100 tokens
-        lastDistributionTime = block.timestamp;
-        optimismVerifierAddress = _optimismVerifierAddress;
-    }
-
-    // Add setter functions for distributionFrequency and distributionAmount
-    function setDistributionFrequency(uint256 _frequency) external onlyOwner {
+    constructor(
+        uint256 _frequency, 
+        uint256 _amount,
+        IWorldID _worldId,
+        string memory _appId,
+        string memory _actionId 
+    ) ERC20("Saturn Token", "SRN") Ownable(msg.sender) {
         distributionFrequency = _frequency;
-    }
-
-    function setDistributionAmount(uint256 _amount) external onlyOwner {
         distributionAmount = _amount;
+        lastDistributionTime = block.timestamp;
+        worldId = _worldId;
+
+        externalNullifier = abi
+            .encodePacked(abi.encodePacked(_appId).hashToField(), _actionId)
+            .hashToField();
+        
+        // Initialize the actionId
+        actionId = abi.encodePacked(_actionId).hashToField();
     }
 
-    function setOptimismVerifierAddress(address _newAddress) external onlyOwner {
-        optimismVerifierAddress = _newAddress;
-    }
+    // Add these event declarations at the contract level
+    event ParticipationSuccessful(address participant);
+    event ParticipationFailed(address participant, string reason);
 
     function participate(
         address signal,
         uint256 root,
         uint256 nullifierHash,
         uint256[8] calldata proof
-    ) external payable {
-        require(!isParticipant(msg.sender), "Already a participant");
+    ) public {
+        if (isParticipant(msg.sender)) {
+            emit ParticipationFailed(msg.sender, "Already a participant");
+            revert("Already a participant");
+        }
 
-        bytes memory payload = abi.encode(msg.sender, signal, root, nullifierHash, proof);
-        _lzSend(OPTIMISM_CHAIN_ID, payload, payable(optimismVerifierAddress), address(0x0), bytes(""), msg.value);
+        // First, we make sure this person hasn't done this before
+		if (nullifierHashes[nullifierHash]) revert DuplicateNullifier(nullifierHash);
+
+        // We now verify the provided proof is valid and the user is verified by World ID
+		// worldId.verifyProof(
+		// 	root,
+		// 	groupId,
+		// 	abi.encodePacked(signal).hashToField(),
+		// 	nullifierHash,
+		// 	externalNullifier,
+		// 	proof
+		// );
+
+        // We now record the user has done this, so they can't do it again (proof of uniqueness)
+		// nullifierHashes[nullifierHash] = true;
+        // Verify WorldID proof
+        try worldId.verifyProof(
+            root,
+            groupId,
+            abi.encodePacked(signal).hashToField(),
+            nullifierHash,
+            externalNullifier,
+            proof
+        ) {
+            // Proof verification successful
+        } catch Error(string memory reason) {
+            emit ParticipationFailed(msg.sender, reason);
+            revert(reason);
+        } catch (bytes memory /*lowLevelData*/) {
+            emit ParticipationFailed(msg.sender, "WorldID verification failed");
+            revert("WorldID verification failed");
+        }
+
+        if (nullifierHashes[nullifierHash]) {
+            emit ParticipationFailed(msg.sender, "Nullifier already used");
+            revert("Nullifier already used");
+        }
+
+        nullifierHashes[nullifierHash] = true;
+        emit Verified(nullifierHash);
+
+        participant_list.push(msg.sender);
+
+        
+        
+        emit ParticipationSuccessful(msg.sender);
     }
 
     function isParticipant(address _address) public view returns (bool) {
@@ -103,16 +176,6 @@ contract SaturnToken is ERC20, Ownable, NonblockingLzApp {
 
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
-    }
-
-    function _nonblockingLzReceive(uint16 _srcChainId, bytes memory _srcAddress, uint64 _nonce, bytes memory _payload) internal override {
-        require(_srcChainId == OPTIMISM_CHAIN_ID, "Invalid source chain");
-        
-        (bool success, address participant) = abi.decode(_payload, (bool, address));
-        
-        if (success) {
-            participant_list.push(participant);
-        }
     }
 
 }

@@ -4,10 +4,24 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useChainId, useSendTransaction } from 'wagmi';
-import { parseEther } from 'viem';
-import { IDKitWidget, ISuccessResult, VerificationLevel } from '@worldcoin/idkit'
-import { createPublicClient, http, createWalletClient, custom } from 'viem';
-import { optimismSepolia } from 'viem/chains';
+import { parseEther, hexToBigInt } from 'viem';
+import { decodeErrorResult } from 'viem';
+
+import { decodeAbiParameters, parseAbiParameters } from 'viem'
+
+import { useWriteContract } from 'wagmi'
+
+// Helper function to safely convert to BigInt
+function safeBigInt(value: string | number | bigint): bigint {
+  if (typeof value === 'bigint') return value;
+  if (typeof value === 'number') return BigInt(value);
+  if (typeof value === 'string') {
+    // Remove '0x' prefix if present
+    const cleanValue = value.startsWith('0x') ? value.slice(2) : value;
+    return BigInt(`0x${cleanValue}`);
+  }
+  throw new Error(`Cannot convert ${value} to BigInt`);
+}
 
 export const ParticipateBox = (proof: any) => {
   const [amount, setAmount] = useState('');
@@ -15,69 +29,137 @@ export const ParticipateBox = (proof: any) => {
   // const { chain } = useNetwork();
   const { sendTransaction } = useSendTransaction();
 
-  const handleParticipate = () => {
-    console.log("Proof: ", proof);
+
+  const {
+    writeContractAsync
+  } = useWriteContract()
+
+  const abi = [
+    {
+      type: "constructor",
+      inputs: [
+        { name: "_frequency", type: "uint256" },
+        { name: "_amount", type: "uint256" },
+        { name: "_worldId", type: "address" },
+        { name: "_appId", type: "string" },
+        { name: "_actionId", type: "string" }
+      ],
+      stateMutability: "nonpayable"
+    },
+    {
+      type: "function",
+      name: "participate",
+      inputs: [
+        { name: "signal", type: "address" },
+        { name: "root", type: "uint256" },
+        { name: "nullifierHash", type: "uint256" },
+        { name: "proof", type: "uint256[8]" }
+      ],
+      outputs: [],
+      stateMutability: "nonpayable"
+    },
+    {
+      type: "function",
+      name: "isParticipant",
+      inputs: [{ name: "_address", type: "address" }],
+      outputs: [{ name: "", type: "bool" }],
+      stateMutability: "view"
+    },
+    {
+      type: "function",
+      name: "distribute",
+      inputs: [],
+      outputs: [],
+      stateMutability: "nonpayable"
+    },
+    {
+      type: "function",
+      name: "getEthBalance",
+      inputs: [],
+      outputs: [{ name: "", type: "uint256" }],
+      stateMutability: "view"
+    },
+    {
+      type: "function",
+      name: "mint",
+      inputs: [
+        { name: "to", type: "address" },
+        { name: "amount", type: "uint256" }
+      ],
+      outputs: [],
+      stateMutability: "nonpayable"
+    },
+    {
+      type: "event",
+      name: "Verified",
+      inputs: [{ name: "nullifierHash", type: "uint256", indexed: false }],
+      anonymous: false
+    },
+    {
+      type: "event",
+      name: "ParticipationSuccessful",
+      inputs: [{ name: "participant", type: "address", indexed: false }],
+      anonymous: false
+    },
+    {
+      type: "event",
+      name: "ParticipationFailed",
+      inputs: [
+        { name: "participant", type: "address", indexed: false },
+        { name: "reason", type: "string", indexed: false }
+      ],
+      anonymous: false
+    },
+    {
+      type: "error",
+      name: "DuplicateNullifier",
+      inputs: [{ name: "nullifierHash", type: "uint256" }]
+    },
+    {
+      type: "error",
+      name: "InvalidNullifier",
+      inputs: []
+    }
+  ];
+
+  const handleParticipate = async () => {
     if (!isConnected) return;
 
-    const abi = [
-      {
-        name: "participate",
-        type: "function",
-        inputs: [
-          { name: "signal", type: "address" },
-          { name: "root", type: "uint256" },
-          { name: "nullifierHash", type: "uint256" },
-          { name: "proof", type: "uint256[8]" }
+    try {
+      console.log("Calling contract with parameters:");
+      console.log("Address:", address);
+      console.log("Merkle Root:", proof.merkle_root);
+      console.log("Nullifier Hash:", proof.nullifier_hash);
+      console.log("Proof:", proof.proof);
+
+      const result = await writeContractAsync({
+        address: '0x56A1D262A3aC373219451476d84999369a6E6357',
+        abi,
+        functionName: 'participate',
+        args: [
+          address, // signal
+          BigInt(proof.merkle_root), // root
+          BigInt(proof.nullifier_hash), // nullifierHash
+          proof.proof.map((p: string) => BigInt(p)) // proof
         ],
-        outputs: [],
-        stateMutability: "nonpayable"
+      });
+
+      console.log("Transaction hash:", result);
+    } catch (error: any) {
+      console.error("Error calling contract:", error);
+      if (error.cause?.data) {
+        try {
+          const decodedError = decodeErrorResult({
+            abi,
+            data: error.cause.data,
+          })
+          console.error("Decoded error:", decodedError)
+        } catch (decodeError) {
+          console.error("Failed to decode error:", decodeError)
+        }
       }
-    ];
-    const toAddress = '0x55f529544965Ab97afb4325dF5D8A9b08f9C58E5';
-
-
-
-    // Create a public client
-    const publicClient = createPublicClient({
-      chain: optimismSepolia,
-      transport: http()
-    });
-
-    // Create a wallet client
-    const walletClient = createWalletClient({
-      chain: optimismSepolia,
-      transport: custom(window.ethereum)
-    });
-
-    // Create the contract instance
-    const contract = {
-      address: toAddress,
-      abi: abi,
-      publicClient,
-      walletClient
-    };
-
-    
-    // send transaction to the contract calling the function participate(), taking no arguments
-    // address signal,
-    //     uint256 root,
-    //     uint256 nullifierHash,
-    //     uint256[8] calldata proof
-    sendTransaction({
-      to: toAddress,
-      data: `0x6817c76c${address?.slice(2)}${proof.proof.merkle_root.slice(2)}${proof.proof.nullifier_hash.slice(2)}${proof.proof.proof.slice(2)}`,
-      // data: '0x6817c76c', // This is the function selector for participate()
-      value: parseEther('0'), // No ETH is sent with this transaction
-    });
-
-    console.log(`Participating in the contract at ${toAddress}`);
-
-    console.log(`Signing up to ${toAddress}`);
-    // Reset amount after donation
-
+    }
   };
-
-
 
 
 
