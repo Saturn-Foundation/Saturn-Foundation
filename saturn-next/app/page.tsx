@@ -11,11 +11,13 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-between screen-max-width">
       <Hero />
-      {/* <About /> */}
+      <About />
+      <Timer/>
+      {/* <Timer/> */}
       <Credential />
       <Timeline />
       {/* <PaymentBox /> */}
-      {/* <Timer/> */}
+    
     </div>
   );
 }

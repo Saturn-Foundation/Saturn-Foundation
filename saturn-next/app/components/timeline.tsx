@@ -23,7 +23,7 @@ const Timeline = () => {
   }
 
   return (
-    <div className="py-24 bg-base-200">
+    <div className="py-24 bg-base-200 mt-40">
      
       <h2 className="text-4xl font-bold text-center mb-12">Our Journey</h2>
       <div className="container mx-auto px-4">

@@ -31,8 +31,8 @@ export function Planet(props: ModelProps) {
 
   useFrame(({ clock }) => {
     if (groupRef.current) {
-      // Rotate 360 degrees every 5 seconds
-      groupRef.current.rotation.y = (clock.getElapsedTime() / 5) * Math.PI * 2;
+      // Rotate 360 degrees every 10 seconds
+      groupRef.current.rotation.y = (clock.getElapsedTime() / 10) * Math.PI * 2;
     }
   });
 

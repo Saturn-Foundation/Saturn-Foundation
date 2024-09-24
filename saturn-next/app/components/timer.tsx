@@ -24,7 +24,7 @@ const Timer = () => {
   }, []);
 
   return (
-    <div className="bg-base-200 p-6 rounded-lg shadow-lg py-16">
+    <div className="bg-base-200 p-6 rounded-lg shadow-lg py-16 mt-20 ">
       <h2 className="text-2xl font-bold mb-4">DAO Governance Stats</h2>
       <div className="grid grid-cols-3 gap-4">
         <motion.div

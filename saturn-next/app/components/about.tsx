@@ -17,7 +17,7 @@ const About = () => {
     <motion.div 
       ref={ref}
       style={{ opacity, scale }}
-      className="hero min-h-screen bg-base-100"
+      className="hero min-h-[60vh] bg-base-100"
     >
       <div className="hero-content flex-col lg:flex-row">
         <motion.div
