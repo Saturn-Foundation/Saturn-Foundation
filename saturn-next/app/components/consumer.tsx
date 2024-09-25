@@ -11,7 +11,7 @@ const Consumer = () => {
         { name: "", logo: "https://tzqzzuafkobkhygtccse.supabase.co/storage/v1/object/public/biz_touch/theme/tiktok.svg?t=2024-09-25T15%3A26%3A07.198Z" }
     ];
     return (
-        <div className="container mx-auto p-20">
+        <div className="container mx-auto p-20 bg-base-100">
             {/* First row: 2 columns */}
             <div className="grid grid-cols-3 gap-4 mb-4">
                 <div className="bg-transparent text-black p-4 rounded-lg col-span-2 rounded-2xl">

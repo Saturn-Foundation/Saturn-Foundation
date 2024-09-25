@@ -214,7 +214,7 @@ const Hero = () => {
   }
 
   return (
-    <div className="hero bg-base-200 min-h-screen">
+    <div className="hero bg-base-300 min-h-screen">
 
       <div className="hero-content flex-col lg:flex-row-reverse h-full w-full">
         <div className="text-center lg:text-left">
