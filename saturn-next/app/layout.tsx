@@ -20,7 +20,7 @@ import LayoutClient from "./layout-client";
 // import { config } from '../config'
 
 export const metadata: Metadata = {
-  title: 'Saturn',
+  title: 'Saturn Foundation',
   description: "The World's First On-Chain UBI.",
   icons: {
     icon: '/favicon.ico',
