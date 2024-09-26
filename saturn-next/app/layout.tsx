@@ -19,8 +19,13 @@ import { useEffect, useState } from "react";
 import LayoutClient from "./layout-client";
 // import { config } from '../config'
 
-
-
+export const metadata: Metadata = {
+  title: 'Saturn',
+  description: "The World's First On-Chain UBI.",
+  icons: {
+    icon: '/favicon.ico',
+  },
+};
 
 export default function RootLayout({
   children,
@@ -30,14 +35,14 @@ export default function RootLayout({
 
   return (
     <html data-theme="retro" lang="en">
-            <body
-            // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-            >
-              <LayoutClient>
-              {children}
-              </LayoutClient>
-         
-            </body>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+      </head>
+      <body>
+        <LayoutClient>
+          {children}
+        </LayoutClient>
+      </body>
     </html>
   );
 }
